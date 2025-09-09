@@ -154,6 +154,7 @@
     &copy; Created by Aniruddha Sajjad
   </footer>
 
+
   <script>
 const upload = document.getElementById("upload");
 const canvas = document.getElementById("canvas");
@@ -163,14 +164,15 @@ const zoomSlider = document.getElementById("zoom");
 
 let uploadedImg = null;
 let frame = new Image();
-frame.src = "frame.png"; // Your frame file
+frame.src = "frame.png"; // your frame file
 let scale = 1;
 
 // Drag variables
-let offsetX = 0;
+let offsetX = 0; // current offset
 let offsetY = 0;
 let isDragging = false;
-let startX, startY;
+let startX = 0;
+let startY = 0;
 
 function drawImage() {
   if (!uploadedImg) return;
@@ -179,8 +181,8 @@ function drawImage() {
   canvas.width = size;
   canvas.height = size;
 
-  const sx = ((uploadedImg.width - size / scale) / 2) + offsetX;
-  const sy = ((uploadedImg.height - size / scale) / 2) + offsetY;
+  const sx = ((uploadedImg.width - size / scale) / 2) - offsetX;
+  const sy = ((uploadedImg.height - size / scale) / 2) - offsetY;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(
@@ -202,11 +204,10 @@ function drawImage() {
   }
 }
 
-// Upload photo
+// Handle upload
 upload.addEventListener("change", (e) => {
   const file = e.target.files[0];
   if (!file) return;
-
   const reader = new FileReader();
   reader.onload = function(event) {
     const img = new Image();
@@ -222,7 +223,7 @@ upload.addEventListener("change", (e) => {
   reader.readAsDataURL(file);
 });
 
-// Zoom slider
+// Zoom
 zoomSlider.addEventListener("input", (e) => {
   scale = parseFloat(e.target.value);
   drawImage();
@@ -231,17 +232,17 @@ zoomSlider.addEventListener("input", (e) => {
 // Mouse drag
 canvas.addEventListener("mousedown", (e) => {
   isDragging = true;
-  startX = e.offsetX;
-  startY = e.offsetY;
+  startX = e.clientX;
+  startY = e.clientY;
 });
 canvas.addEventListener("mousemove", (e) => {
   if (!isDragging) return;
-  const dx = (e.offsetX - startX) / scale;
-  const dy = (e.offsetY - startY) / scale;
+  const dx = (e.clientX - startX) / scale;
+  const dy = (e.clientY - startY) / scale;
   offsetX += dx;
   offsetY += dy;
-  startX = e.offsetX;
-  startY = e.offsetY;
+  startX = e.clientX;
+  startY = e.clientY;
   drawImage();
 });
 canvas.addEventListener("mouseup", () => { isDragging = false; });
@@ -251,29 +252,25 @@ canvas.addEventListener("mouseleave", () => { isDragging = false; });
 canvas.addEventListener("touchstart", (e) => {
   isDragging = true;
   const touch = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  startX = touch.clientX - rect.left;
-  startY = touch.clientY - rect.top;
+  startX = touch.clientX;
+  startY = touch.clientY;
 });
 canvas.addEventListener("touchmove", (e) => {
   if (!isDragging) return;
   e.preventDefault();
   const touch = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  const currentX = touch.clientX - rect.left;
-  const currentY = touch.clientY - rect.top;
-  const dx = (currentX - startX) / scale;
-  const dy = (currentY - startY) / scale;
+  const dx = (touch.clientX - startX) / scale;
+  const dy = (touch.clientY - startY) / scale;
   offsetX += dx;
   offsetY += dy;
-  startX = currentX;
-  startY = currentY;
+  startX = touch.clientX;
+  startY = touch.clientY;
   drawImage();
 });
 canvas.addEventListener("touchend", () => { isDragging = false; });
 canvas.addEventListener("touchcancel", () => { isDragging = false; });
 
-// Download photo
+// Download
 downloadBtn.addEventListener("click", () => {
   const link = document.createElement("a");
   link.download = "framed-photo.png";
@@ -281,6 +278,7 @@ downloadBtn.addEventListener("click", () => {
   link.click();
 });
 </script>
+
 
 </body>
 </html>
