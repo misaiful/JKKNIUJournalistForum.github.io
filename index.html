@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Frame to Your Photo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f2f2f2;
+      padding: 30px;
+    }
+    h2 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+    canvas {
+      margin-top: 20px;
+      border-radius: 12px;
+      max-width: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    input[type=file] {
+      margin: 15px 0;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background: #0070f3;
+      color: white;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #0059c1;
+    }
+  </style>
+</head>
+<body>
+  <h2>🎉 Add Your Photo to Our Frame</h2>
+  <input type="file" id="upload" accept="image/*">
+  <br>
+  <canvas id="canvas"></canvas>
+  <br>
+  <button id="downloadBtn" style="display:none;">Download Photo</button>
+
+  <script>
+    const upload = document.getElementById("upload");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const downloadBtn = document.getElementById("downloadBtn");
+
+    // Load frame image
+    const frame = new Image();
+    frame.src = "frame.png"; // Your frame file must be in same folder
+
+    upload.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          // Set canvas size same as uploaded photo
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          // Draw uploaded photo
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // Draw frame on top
+          if (frame.complete) {
+            ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
+          } else {
+            frame.onload = () => {
+              ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
+            };
+          }
+
+          // Show download button
+          downloadBtn.style.display = "inline-block";
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      const link = document.createElement("a");
+      link.download = "framed-photo.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+  </script>
+</body>
+</html>
