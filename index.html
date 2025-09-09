@@ -168,7 +168,7 @@ frame.src = "frame.png"; // your frame file
 let scale = 1;
 
 // Drag variables
-let offsetX = 0; // current offset
+let offsetX = 0;
 let offsetY = 0;
 let isDragging = false;
 let startX = 0;
@@ -239,8 +239,8 @@ canvas.addEventListener("mousemove", (e) => {
   if (!isDragging) return;
   const dx = (e.clientX - startX) / scale;
   const dy = (e.clientY - startY) / scale;
-  offsetX += dx;
-  offsetY += dy;
+  offsetX -= dx; // reversed
+  offsetY -= dy; // reversed
   startX = e.clientX;
   startY = e.clientY;
   drawImage();
@@ -261,8 +261,8 @@ canvas.addEventListener("touchmove", (e) => {
   const touch = e.touches[0];
   const dx = (touch.clientX - startX) / scale;
   const dy = (touch.clientY - startY) / scale;
-  offsetX += dx;
-  offsetY += dy;
+  offsetX -= dx; // reversed
+  offsetY -= dy; // reversed
   startX = touch.clientX;
   startY = touch.clientY;
   drawImage();
@@ -278,6 +278,7 @@ downloadBtn.addEventListener("click", () => {
   link.click();
 });
 </script>
+
 
 
 </body>
